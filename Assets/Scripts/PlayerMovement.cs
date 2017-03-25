@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour {
 			rigidBody.angularVelocity = 0f;
 			return;
 		}
-		var currentDirection = transform.forward;
+		var currentDirection = transform.up;
 		var currentAngle = Mathf.Atan2(currentDirection.x, currentDirection.y) * Mathf.Rad2Deg;
 		var targetAngle = Mathf.Atan2(targetDirection.x, targetDirection.y) * Mathf.Rad2Deg;
 		var deltaAngle = Mathf.DeltaAngle(currentAngle, targetAngle);
