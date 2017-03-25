@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Net.Sockets;
 
-public class Client2 : MonoBehaviour {
+public class SocketClient {
 	internal Boolean socketReady = false;
 	TcpClient mySocket;
 	NetworkStream theStream;
@@ -13,17 +13,8 @@ public class Client2 : MonoBehaviour {
 	String Host = "localhost";
 	Int32 Port = 12345;
 
-	void Start () {
-		setupSocket ();
-		writeSocket ("hello from client2");
-	}
-
-	void Update () {
-		Debug.Log (readSocket ());
-	}
-
 	// **********************************************
-	public void setupSocket() {
+	public void SetupSocket() {
 		try {
 			mySocket = new TcpClient(Host, Port);
 			theStream = mySocket.GetStream();
@@ -36,7 +27,7 @@ public class Client2 : MonoBehaviour {
 		}
 	}
 
-	public void writeSocket(string theLine) {
+	public void WriteSocket(string theLine) {
 		if (!socketReady)
 			return;
 		String foo = theLine + "\r\n";
@@ -44,7 +35,7 @@ public class Client2 : MonoBehaviour {
 		theWriter.Flush();
 	}
 
-	public String readSocket() {
+	public String ReadSocket() {
 		if (!socketReady)
 			return "";
 		if (theStream.DataAvailable)
@@ -52,7 +43,7 @@ public class Client2 : MonoBehaviour {
 		return "";
 	}
 
-	public void closeSocket() {
+	public void CloseSocket() {
 		if (!socketReady)
 			return;
 		theWriter.Close();

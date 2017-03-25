@@ -6,14 +6,18 @@ public class PlayerMovement : MonoBehaviour {
 	private Rigidbody2D rigidBody;
 	public float speed = 10;
 	public float torqueSpeed = 400;
+	private SocketClient client;
 
 	void Start() {
 		rigidBody = GetComponent<Rigidbody2D> ();
+		client = new SocketClient ();
+		client.SetupSocket ();
 	}
 
 	void Update() {
 		Rotate ();
 		Move();
+		WriteToSocket ();
 	}
 
 	void Rotate() {
@@ -36,5 +40,10 @@ public class PlayerMovement : MonoBehaviour {
 		float moveVertical = Input.GetAxis("Vertical");
 		Vector2 inputDirection = new Vector2(moveHorizontal, moveVertical);
 		rigidBody.velocity = (inputDirection * speed);
+	}
+
+	private void WriteToSocket () {
+		string message = transform.position.x + "," + transform.position.y + "\n";
+		client.WriteSocket (message);
 	}
 }
