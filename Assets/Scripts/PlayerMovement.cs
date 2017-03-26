@@ -6,11 +6,21 @@ public class PlayerMovement : MonoBehaviour {
 	private Rigidbody2D rigidBody;
 	public float speed = 10;
 	public float torqueSpeed = 400;
+
+	public Sprite frontImage;
+	public Sprite leftImage;
+	public Sprite rightImage;
+	public Sprite backImage;
+
 	private SocketClient client;
 	public Camera camera;
 	private Vector3 offset;
+	private SpriteRenderer spriteRenderer;
+	private Animator animator;
 
 	void Start() {
+		spriteRenderer = GetComponent<SpriteRenderer>();
+		animator = GetComponent<Animator>();
 		rigidBody = GetComponent<Rigidbody2D> ();
 		client = new SocketClient ();
 		client.SetupSocket ();
@@ -18,8 +28,9 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void Update() {
-		Rotate ();
-		Move();
+		//Rotate ();
+		//Move();
+		JerkyWalking();
 		MoveCamera ();
 		WriteToSocket ();
 	}
@@ -44,6 +55,50 @@ public class PlayerMovement : MonoBehaviour {
 		float moveVertical = Input.GetAxis("Vertical");
 		Vector2 inputDirection = new Vector2(moveHorizontal, moveVertical);
 		rigidBody.velocity = (inputDirection * speed);
+	}
+
+	void JerkyWalking() {
+		if (Input.GetKey(KeyCode.LeftArrow))
+		{
+			transform.position += Vector3.left * speed * Time.deltaTime;
+			animator.SetBool ("left", true);
+			animator.SetBool ("front", false);
+			animator.SetBool ("back", false);
+			animator.SetBool ("right", false);
+			animator.SetFloat ("speed", speed);
+		}
+		if (Input.GetKey(KeyCode.RightArrow))
+		{
+			transform.position += Vector3.right * speed * Time.deltaTime;
+			animator.SetBool ("right", true);
+			animator.SetBool ("front", false);
+			animator.SetBool ("back", false);
+			animator.SetBool ("left", false);
+			animator.SetFloat ("speed", speed);
+		}
+		if (Input.GetKey(KeyCode.UpArrow))
+		{
+			transform.position += Vector3.up * speed * Time.deltaTime;
+			animator.SetBool ("back", true);
+			animator.SetBool ("front", false);
+			animator.SetBool ("right", false);
+			animator.SetBool ("left", false);
+			animator.SetFloat ("speed", speed);
+		}
+		if (Input.GetKey(KeyCode.DownArrow))
+		{
+			transform.position += Vector3.down * speed * Time.deltaTime;
+			animator.SetBool ("front", true);
+			animator.SetBool ("right", false);
+			animator.SetBool ("back", false);
+			animator.SetBool ("left", false);
+			animator.SetFloat ("speed", speed);
+		}
+		if(Input.anyKey == false)
+		{
+			animator.SetFloat ("speed", 0);
+		}
+		Debug.Log (animator.GetBool ("left"));
 	}
 
 	private void MoveCamera() {
