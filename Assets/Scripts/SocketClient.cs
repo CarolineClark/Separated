@@ -10,7 +10,7 @@ public class SocketClient {
 	NetworkStream theStream;
 	StreamWriter theWriter;
 	StreamReader theReader;
-	String Host = "localhost";
+	String Host = "192.168.0.5";
 	Int32 Port = 12345;
 
 	// **********************************************
