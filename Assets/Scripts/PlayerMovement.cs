@@ -18,6 +18,8 @@ public class PlayerMovement : MonoBehaviour {
 	private SpriteRenderer spriteRenderer;
 	private Animator animator;
 
+	private Vector2 playerDestination;
+
 	void Start() {
 		spriteRenderer = GetComponent<SpriteRenderer>();
 		animator = GetComponent<Animator>();
@@ -25,12 +27,25 @@ public class PlayerMovement : MonoBehaviour {
 		client = new SocketClient ();
 		client.SetupSocket ();
 		offset = camera.transform.position - transform.position;
+		playerDestination = transform.position;
 	}
 
 	void Update() {
 		//Rotate ();
-		//Move();
-		JerkyWalking();
+		Move();
+		if (Input.GetMouseButtonDown (0)) {
+				playerDestination = camera.ScreenToWorldPoint (
+					new Vector3(
+						Input.mousePosition.x, 
+						Input.mousePosition.y, 
+						-camera.transform.position.z
+					)
+				);
+		}
+		if (!playerDestination.Equals(transform.position)) {
+			MoveTowards (playerDestination);
+		}
+//		JerkyWalking();
 		MoveCamera ();
 		WriteToSocket ();
 	}
@@ -48,6 +63,27 @@ public class PlayerMovement : MonoBehaviour {
 		var deltaAngle = Mathf.DeltaAngle(currentAngle, targetAngle);
 		rotationDelta = -deltaAngle/180f;
 		rigidBody.angularVelocity = rotationDelta * torqueSpeed;
+	}
+
+	private void MoveTowards(Vector2 destination) {
+		float moveHorizontal = destination.x - transform.position.x;
+		float moveVertical = destination.y - transform.position.y;
+		Vector2 direction = new Vector2 (moveHorizontal, moveVertical);
+		if (direction.magnitude < 0.5) {
+			animator.SetFloat ("speed", 0);
+			return;
+		}
+		direction.Normalize ();
+		rigidBody.velocity = direction * speed;
+		if (moveHorizontal > 0 && Mathf.Abs (moveHorizontal / moveVertical) > 1) {
+			PlayRightAnimation ();
+		} else if (moveVertical > 0 && Mathf.Abs (moveVertical / moveHorizontal) > 1) {
+			PlayUpAnimation ();
+		} else if (moveVertical < 0 && Mathf.Abs (moveVertical / moveHorizontal) > 1) {
+			PlayDownAnimation ();
+		} else if (moveHorizontal < 0 && Mathf.Abs (moveHorizontal / moveVertical) > 1) {
+			PlayLeftAnimation ();
+		}
 	}
 
 	private void Move() {
@@ -78,27 +114,42 @@ public class PlayerMovement : MonoBehaviour {
 		{
 			animator.SetFloat ("speed", 0);
 		}
-		Debug.Log (animator.GetBool ("left"));
 	}
 
 	private void MoveLeft() {
 		transform.position += Vector3.left * speed * Time.deltaTime;
-		SetAnimation (true, false, false, false, speed);
+		PlayLeftAnimation ();
 	}
 
 	private void MoveUp() {
 		transform.position += Vector3.up * speed * Time.deltaTime;
-		SetAnimation (false, false, true, false, speed);
+		PlayUpAnimation ();
 	}
 
 	private void MoveDown() {
 		transform.position += Vector3.down * speed * Time.deltaTime;
-		SetAnimation (false, false, false, true, speed);
+		PlayDownAnimation ();
 	}
 
 	private void MoveRight() {
 		transform.position += Vector3.right * speed * Time.deltaTime;
+		PlayRightAnimation ();
+	}
+
+	private void PlayLeftAnimation() {
+		SetAnimation (true, false, false, false, speed);
+	}
+
+	private void PlayRightAnimation() {
 		SetAnimation (false, true, false, false, speed);
+	}
+
+	private void PlayUpAnimation() {
+		SetAnimation (false, false, true, false, speed);
+	}
+
+	private void PlayDownAnimation() {
+		SetAnimation (false, false, false, true, speed);
 	}
 
 	private void SetAnimation(bool left, bool right, bool up, bool down, float speed) {
