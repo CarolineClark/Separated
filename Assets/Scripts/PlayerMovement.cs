@@ -15,13 +15,11 @@ public class PlayerMovement : MonoBehaviour {
 	private SocketClient client;
 	public Camera camera;
 	private Vector3 offset;
-	private SpriteRenderer spriteRenderer;
 	private Animator animator;
 
 	private Vector2 playerDestination;
 
 	void Start() {
-		spriteRenderer = GetComponent<SpriteRenderer>();
 		animator = GetComponent<Animator>();
 		rigidBody = GetComponent<Rigidbody2D> ();
 		client = new SocketClient ();
@@ -32,7 +30,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	void Update() {
 		//Rotate ();
-		Move();
+//		Move();
 		if (Input.GetMouseButtonDown (0)) {
 				playerDestination = camera.ScreenToWorldPoint (
 					new Vector3(
@@ -66,11 +64,13 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	private void MoveTowards(Vector2 destination) {
+		Debug.Log("moving towards " + destination); 
 		float moveHorizontal = destination.x - transform.position.x;
 		float moveVertical = destination.y - transform.position.y;
 		Vector2 direction = new Vector2 (moveHorizontal, moveVertical);
 		if (direction.magnitude < 0.5) {
 			animator.SetFloat ("speed", 0);
+			rigidBody.velocity = new Vector2(0,0);
 			return;
 		}
 		direction.Normalize ();
@@ -166,6 +166,9 @@ public class PlayerMovement : MonoBehaviour {
 
 	private void WriteToSocket () {
 		string message = transform.position.x + "," + transform.position.y + "\n";
-		client.WriteSocket (message);
+		if (!message.Equals(",")) {
+			Debug.Log ("sending data " + message);
+			client.WriteSocket (message);	
+		}
 	}
 }

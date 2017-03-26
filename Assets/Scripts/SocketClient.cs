@@ -18,6 +18,7 @@ public class SocketClient {
 		try {
 			mySocket = new TcpClient(Host, Port);
 			theStream = mySocket.GetStream();
+			theStream.ReadTimeout = 1;
 			theWriter = new StreamWriter(theStream);
 			theReader = new StreamReader(theStream);
 			socketReady = true;
@@ -38,9 +39,11 @@ public class SocketClient {
 	public String ReadSocket() {
 		if (!socketReady)
 			return "";
-		if (theStream.DataAvailable)
+		try {
 			return theReader.ReadLine();
-		return "";
+		} catch (Exception e) {
+			return "";
+		}
 	}
 
 	public void CloseSocket() {
