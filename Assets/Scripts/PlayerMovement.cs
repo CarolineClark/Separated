@@ -60,45 +60,53 @@ public class PlayerMovement : MonoBehaviour {
 	void JerkyWalking() {
 		if (Input.GetKey(KeyCode.LeftArrow))
 		{
-			transform.position += Vector3.left * speed * Time.deltaTime;
-			animator.SetBool ("left", true);
-			animator.SetBool ("front", false);
-			animator.SetBool ("back", false);
-			animator.SetBool ("right", false);
-			animator.SetFloat ("speed", speed);
+			MoveLeft ();
 		}
 		if (Input.GetKey(KeyCode.RightArrow))
 		{
-			transform.position += Vector3.right * speed * Time.deltaTime;
-			animator.SetBool ("right", true);
-			animator.SetBool ("front", false);
-			animator.SetBool ("back", false);
-			animator.SetBool ("left", false);
-			animator.SetFloat ("speed", speed);
+			MoveRight ();
 		}
 		if (Input.GetKey(KeyCode.UpArrow))
 		{
-			transform.position += Vector3.up * speed * Time.deltaTime;
-			animator.SetBool ("back", true);
-			animator.SetBool ("front", false);
-			animator.SetBool ("right", false);
-			animator.SetBool ("left", false);
-			animator.SetFloat ("speed", speed);
+			MoveUp ();
 		}
 		if (Input.GetKey(KeyCode.DownArrow))
 		{
-			transform.position += Vector3.down * speed * Time.deltaTime;
-			animator.SetBool ("front", true);
-			animator.SetBool ("right", false);
-			animator.SetBool ("back", false);
-			animator.SetBool ("left", false);
-			animator.SetFloat ("speed", speed);
+			MoveDown ();
 		}
 		if(Input.anyKey == false)
 		{
 			animator.SetFloat ("speed", 0);
 		}
 		Debug.Log (animator.GetBool ("left"));
+	}
+
+	private void MoveLeft() {
+		transform.position += Vector3.left * speed * Time.deltaTime;
+		SetAnimation (true, false, false, false, speed);
+	}
+
+	private void MoveUp() {
+		transform.position += Vector3.up * speed * Time.deltaTime;
+		SetAnimation (false, false, true, false, speed);
+	}
+
+	private void MoveDown() {
+		transform.position += Vector3.down * speed * Time.deltaTime;
+		SetAnimation (false, false, false, true, speed);
+	}
+
+	private void MoveRight() {
+		transform.position += Vector3.right * speed * Time.deltaTime;
+		SetAnimation (false, true, false, false, speed);
+	}
+
+	private void SetAnimation(bool left, bool right, bool up, bool down, float speed) {
+		animator.SetBool ("left", left);
+		animator.SetBool ("front", down);
+		animator.SetBool ("back", up);
+		animator.SetBool ("right", right);
+		animator.SetFloat ("speed", speed);
 	}
 
 	private void MoveCamera() {
